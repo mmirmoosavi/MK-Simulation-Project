@@ -31,8 +31,12 @@ class TeacherViewSet(ModelViewSet):
 
     @action(methods=['get'], detail=True, url_path='courses', url_name='courses')
     def courses(self, request, *args, **kwargs):
+        # set pagination class for this action
         self.pagination_class = TeacherCoursePagination
+
+        # set course serializer to show the courses of a teacher
         self.serializer_class = CourseReadSerializer
+
         queryset = Course.objects.filter(teacher__id=kwargs.get('pk')).select_related('teacher').annotate(
             review_count=Count('review__id'),
             review_score_avg=Avg('review__score')
@@ -52,3 +56,9 @@ class ReviewViewSet(GenericViewSet,
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # get django user
+        django_user = self.request.user
+        # return review of specific django_user only
+        return Review.objects.filter(user=django_user)

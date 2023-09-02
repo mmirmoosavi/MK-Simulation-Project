@@ -29,8 +29,14 @@ class CourseWriteSerializer(serializers.ModelSerializer):
     def validate_price(self, value):
         if value < 1000000:
             raise ValidationError(detail={'title': 'cannot create course',
-                                  'detail': "you cannot create course that price is lower than 100000"})
+                                          'detail': "you cannot create course that price is lower than 100000"})
 
+    class Meta:
+        model = Course
+        fields = "__all__"
+
+
+class CourseBriefSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = "__all__"
@@ -48,7 +54,7 @@ class CourseReadSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    course = CourseReadSerializer()
+    course = CourseBriefSerializer()
 
     class Meta:
         model = Review
