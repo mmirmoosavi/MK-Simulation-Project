@@ -7,8 +7,11 @@ install python3 and add new virtualenv
 install packages with pip3 install -r requirements.txt
 
 cd mysite
+
 python manage.py migrate
+
 python manage.py loaddata fixture.json
+
 python mange.py runserver 8080
 
 # access the api
