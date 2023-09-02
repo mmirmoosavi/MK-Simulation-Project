@@ -1,4 +1,6 @@
 from django.db.models import Count, Avg
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.mixins import ListModelMixin
@@ -6,6 +8,7 @@ from rest_framework.mixins import ListModelMixin
 from .permissions import CustomCoursePermission
 from .serializers import CourseReadSerializer, CourseWriteSerializer, TeacherSerializer, ReviewSerializer
 from .models import Course, Teacher, Review
+from .utils import TeacherCoursePagination
 
 
 class CourseViewSet(ModelViewSet):
@@ -16,7 +19,7 @@ class CourseViewSet(ModelViewSet):
     )
 
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update', 'create','destroy']:
+        if self.action in ['update', 'partial_update', 'create', 'destroy']:
             return CourseWriteSerializer
         else:
             return CourseReadSerializer
@@ -25,6 +28,23 @@ class CourseViewSet(ModelViewSet):
 class TeacherViewSet(ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
+
+    @action(methods=['get'], detail=True, url_path='courses', url_name='courses')
+    def courses(self, request, *args, **kwargs):
+        self.pagination_class = TeacherCoursePagination
+        self.serializer_class = CourseReadSerializer
+        queryset = Course.objects.filter(teacher__id=kwargs.get('pk')).select_related('teacher').annotate(
+            review_count=Count('review__id'),
+            review_score_avg=Avg('review__score')
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(GenericViewSet,
