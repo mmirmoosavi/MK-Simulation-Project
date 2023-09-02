@@ -26,6 +26,9 @@ class Course(BaseModel):
     price = models.PositiveIntegerField(default=0)
     published_at = models.DateTimeField()
 
+    class Meta:
+        ordering = ['-published_at']
+
 
 class Review(BaseModel):
     SCORE_CHOICES = (
