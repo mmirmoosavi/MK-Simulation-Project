@@ -9,6 +9,7 @@ User = get_user_model()
 
 
 class UserViewSet(ModelViewSet):
+    # only admin has access to this viewset
     permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
