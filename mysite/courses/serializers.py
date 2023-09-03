@@ -23,13 +23,15 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 
 class CourseWriteSerializer(serializers.ModelSerializer):
-    review_count = IntegerField()
-    review_score_avg = FloatField()
+    review_count = IntegerField(read_only=True)
+    review_score_avg = FloatField(read_only=True)
 
     def validate_price(self, value):
         if value < 1000000:
-            raise ValidationError(detail={'title': 'cannot create course',
-                                          'detail': "you cannot create course that price is lower than 100000"})
+            raise ValidationError(detail={'title': 'cannot create or update course',
+                                          'detail': "you cannot create or update "
+                                                    "course that price is lower than 100000"})
+        return value
 
     class Meta:
         model = Course
