@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.mixins import ListModelMixin
 
-from .permissions import CustomCoursePermission
+from .permissions import CustomCoursePermission, CustomTeacherPermission
 from .serializers import CourseReadSerializer, CourseWriteSerializer, TeacherSerializer, ReviewSerializer
 from .models import Course, Teacher, Review
 from .utils import TeacherCoursePagination
@@ -26,6 +26,8 @@ class CourseViewSet(ModelViewSet):
 
 
 class TeacherViewSet(ModelViewSet):
+    permission_classes = [CustomTeacherPermission]
+
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 
