@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, FloatField
@@ -27,7 +28,7 @@ class CourseWriteSerializer(serializers.ModelSerializer):
     review_score_avg = FloatField(read_only=True)
 
     def validate_price(self, value):
-        if value < 1000000:
+        if value < settings.MINIMUM_COURSE_PRICE:
             raise ValidationError(detail={'title': 'cannot create or update course',
                                           'detail': "you cannot create or update "
                                                     "course that price is lower than 100000"})
